@@ -7,6 +7,7 @@ const PHONE_HREF = "tel:+16046987185"
 const FORM_SUBMIT_URL = "https://formsubmit.co/peterbain179@gmail.com"
 const LOGO_IMAGE = "/oma/logo-light.png"
 const LOGO_DARK_IMAGE = "/oma/logo-dark.png"
+const HEADER_LOGO_IMAGE = "/oma/logo-header.png"
 const HERO_IMAGE = "/oma/work-9.jpg"
 
 const services = [
@@ -178,7 +179,7 @@ export default function App() {
     <div className="site-shell">
       <header className="site-header">
         <a className="brand" href="#top" aria-label={`${COMPANY_NAME} home`}>
-          <img src={LOGO_IMAGE} alt={`${COMPANY_NAME} logo`} />
+          <img src={HEADER_LOGO_IMAGE} alt={`${COMPANY_NAME} logo`} />
         </a>
 
         <nav className="site-nav" aria-label="Main navigation">
