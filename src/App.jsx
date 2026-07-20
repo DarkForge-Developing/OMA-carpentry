@@ -5,7 +5,6 @@ const COMPANY_NAME = "Oma Carpentry & Handyman Services"
 const PHONE_DISPLAY = "(604) 698-7185"
 const PHONE_HREF = "tel:+16046987185"
 const FORM_SUBMIT_URL = "https://formsubmit.co/peterbain179@gmail.com"
-const LOGO_IMAGE = "/oma/logo-light.png"
 const LOGO_DARK_IMAGE = "/oma/logo-dark.png"
 const HEADER_LOGO_IMAGE = "/oma/logo-header.png"
 const HERO_IMAGE = "/oma/work-9.jpg"
@@ -64,14 +63,6 @@ const builtInGalleryImages = [
   { name: "Hallway trim and doors", url: "/oma/work-10.jpg" },
 ]
 
-const initialChatMessages = [
-  {
-    role: "assistant",
-    content:
-      "Hi! Tell me what needs building or fixing, and I can help you prepare a clear request for Oma Carpentry.",
-  },
-]
-
 const navLinks = [
   ["Services", "#services"],
   ["Work", "#work"],
@@ -81,10 +72,6 @@ const navLinks = [
 
 export default function App() {
   const [galleryImages, setGalleryImages] = useState([])
-  const [isChatOpen, setIsChatOpen] = useState(false)
-  const [chatInput, setChatInput] = useState("")
-  const [chatMessages, setChatMessages] = useState(initialChatMessages)
-  const [isChatSending, setIsChatSending] = useState(false)
   const displayGalleryImages = [...builtInGalleryImages, ...galleryImages]
 
   const fetchImages = useCallback(async () => {
@@ -117,63 +104,6 @@ export default function App() {
   useEffect(() => {
     fetchImages()
   }, [fetchImages])
-
-  async function handleChatSubmit(event) {
-    event.preventDefault()
-
-    const content = chatInput.trim()
-
-    if (!content || isChatSending) return
-
-    const nextMessages = [
-      ...chatMessages,
-      {
-        role: "user",
-        content,
-      },
-    ]
-
-    setChatMessages(nextMessages)
-    setChatInput("")
-    setIsChatSending(true)
-
-    try {
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          messages: nextMessages,
-        }),
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data?.error || "The assistant could not respond.")
-      }
-
-      setChatMessages([
-        ...nextMessages,
-        {
-          role: "assistant",
-          content: data.reply,
-        },
-      ])
-    } catch (error) {
-      console.log(error)
-      setChatMessages([
-        ...nextMessages,
-        {
-          role: "assistant",
-          content: `I could not connect to the assistant right now. Please call or text ${PHONE_DISPLAY}.`,
-        },
-      ])
-    } finally {
-      setIsChatSending(false)
-    }
-  }
 
   return (
     <div className="site-shell">
@@ -365,63 +295,6 @@ export default function App() {
         </a>
       </footer>
 
-      <div className="chat-widget">
-        {isChatOpen && (
-          <div className="chat-panel">
-            <div className="chat-header">
-              <strong>Oma Assistant</strong>
-              <button
-                type="button"
-                onClick={() => setIsChatOpen(false)}
-                aria-label="Close assistant"
-              >
-                x
-              </button>
-            </div>
-
-            <div className="chat-messages">
-              {chatMessages.map((message, index) => {
-                const isUser = message.role === "user"
-
-                return (
-                  <div
-                    className={isUser ? "chat-message user" : "chat-message"}
-                    key={`${message.role}-${index}`}
-                  >
-                    {message.content}
-                  </div>
-                )
-              })}
-
-              {isChatSending && <div className="chat-status">Typing...</div>}
-            </div>
-
-            <form className="chat-form" onSubmit={handleChatSubmit}>
-              <input
-                value={chatInput}
-                onChange={(event) => setChatInput(event.target.value)}
-                placeholder="Ask a question"
-                aria-label="Ask the assistant a question"
-              />
-              <button
-                type="submit"
-                disabled={isChatSending || !chatInput.trim()}
-              >
-                Send
-              </button>
-            </form>
-          </div>
-        )}
-
-        <button
-          type="button"
-          className="chat-toggle"
-          onClick={() => setIsChatOpen((current) => !current)}
-          aria-label="Open assistant"
-        >
-          <img src={LOGO_IMAGE} alt="" aria-hidden="true" />
-        </button>
-      </div>
     </div>
   )
 }
